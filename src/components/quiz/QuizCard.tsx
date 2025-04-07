@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   Card, 
@@ -38,13 +37,17 @@ const QuizCard = ({
   onNextQuestion
 }: QuizCardProps) => {
   const isAnswerSelected = selectedAnswer !== null;
-  const isCorrect = selectedAnswer === currentQuestion.answer;
 
-  // Ensure we have a proper handler for radio selection
   const handleRadioChange = (value: string) => {
-    console.log("Radio value selected:", value);
     onAnswerSelect(value);
   };
+
+  const handleNextQuestion = () => {
+    onNextQuestion();
+  };
+
+  // Explicitly converting to string only if there's a selected answer
+  const selectedValue = selectedAnswer !== null ? selectedAnswer.toString() : undefined;
 
   return (
     <Card>
@@ -72,7 +75,7 @@ const QuizCard = ({
         </div>
 
         <RadioGroup 
-          value={selectedAnswer !== null ? selectedAnswer.toString() : undefined}
+          value={selectedValue}
           onValueChange={handleRadioChange}
           className="space-y-3"
           disabled={isResultShown}
@@ -124,7 +127,7 @@ const QuizCard = ({
           </Button>
         ) : (
           <Button 
-            onClick={onNextQuestion} 
+            onClick={handleNextQuestion} 
             className="w-full"
           >
             {currentQuestionIndex < questionsLength - 1 ? (

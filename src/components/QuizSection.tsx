@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import QuizCard from './quiz/QuizCard';
 import QuizResults from './quiz/QuizResults';
 
@@ -19,49 +18,55 @@ interface QuizSectionProps {
 }
 
 const QuizSection = ({ questions, languageId, onComplete }: QuizSectionProps) => {
+  // Current question index
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [selectedAnswers, setSelectedAnswers] = useState<Record<string, number | null>>({});
+  
+  // Track answers separately
+  const [answersRecord, setAnswersRecord] = useState<Record<string, number>>({});
+  
+  // Track which question has been checked
   const [showResults, setShowResults] = useState<Record<string, boolean>>({});
+  
+  // Current selection (separate from saved answers)
+  const [currentSelection, setCurrentSelection] = useState<number | null>(null);
+  
   const [quizCompleted, setQuizCompleted] = useState(false);
 
   const currentQuestion = questions[currentQuestionIndex];
 
+  // Reset current selection whenever question changes
+  useEffect(() => {
+    setCurrentSelection(null);
+  }, [currentQuestionIndex]);
+
   const handleAnswerSelect = (value: string) => {
-    console.log("Answer selected in QuizSection:", value);
-    // Convert to number before storing
     const answerIndex = parseInt(value, 10);
-    
-    setSelectedAnswers(prev => ({
-      ...prev, 
-      [currentQuestion.id]: answerIndex
-    }));
+    setCurrentSelection(answerIndex);
   };
 
   const handleCheckAnswer = () => {
-    setShowResults(prev => ({
-      ...prev,
-      [currentQuestion.id]: true
-    }));
+    if (currentSelection !== null) {
+      // Save the answer to our record when checking
+      setAnswersRecord(prev => ({
+        ...prev,
+        [currentQuestion.id]: currentSelection
+      }));
+      
+      // Show the result
+      setShowResults(prev => ({
+        ...prev,
+        [currentQuestion.id]: true
+      }));
+    }
   };
 
   const handleNextQuestion = () => {
     if (currentQuestionIndex < questions.length - 1) {
-      // Move to the next question first
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-      
-      // Actually reset the selection for the next question by NOT including it in selectedAnswers
-      // This was the bug - we had the comment but weren't actually doing the reset
-      const nextQuestionId = questions[currentQuestionIndex + 1].id;
-      setSelectedAnswers(prev => {
-        const newSelections = {...prev};
-        // Ensure the next question has no selected answer
-        newSelections[nextQuestionId] = null;
-        return newSelections;
-      });
+      // Just move to the next question
+      setCurrentQuestionIndex(prevIndex => prevIndex + 1);
+      // currentSelection will be reset by useEffect
     } else {
       setQuizCompleted(true);
-      
-      // Calculate final score for the callback
       const correctCount = getCorrectCount();
       if (onComplete) {
         onComplete(correctCount, questions.length);
@@ -71,15 +76,16 @@ const QuizSection = ({ questions, languageId, onComplete }: QuizSectionProps) =>
 
   const resetQuiz = () => {
     setCurrentQuestionIndex(0);
-    setSelectedAnswers({});
+    setAnswersRecord({});
     setShowResults({});
+    setCurrentSelection(null);
     setQuizCompleted(false);
   };
 
   const getCorrectCount = () => {
     let correct = 0;
     questions.forEach(question => {
-      if (selectedAnswers[question.id] === question.answer) {
+      if (answersRecord[question.id] === question.answer) {
         correct++;
       }
     });
@@ -91,16 +97,17 @@ const QuizSection = ({ questions, languageId, onComplete }: QuizSectionProps) =>
       {quizCompleted ? (
         <QuizResults 
           questions={questions}
-          selectedAnswers={selectedAnswers}
+          selectedAnswers={answersRecord}
           languageId={languageId}
           resetQuiz={resetQuiz}
         />
       ) : (
         <QuizCard
+          key={`question-${currentQuestionIndex}`} // Force re-render on question change
           currentQuestion={currentQuestion}
           currentQuestionIndex={currentQuestionIndex}
           questionsLength={questions.length}
-          selectedAnswer={selectedAnswers[currentQuestion.id] ?? null}
+          selectedAnswer={currentSelection}
           isResultShown={showResults[currentQuestion.id] || false}
           correctCount={getCorrectCount()}
           onAnswerSelect={handleAnswerSelect}
