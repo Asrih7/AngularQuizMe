@@ -28,6 +28,7 @@ const Footer = () => {
             </svg>
             <span className="sr-only">Asrih Angular Academy</span>
           </a>
+          Angular Training Platform
         </div>
       </div>
     </footer>
