@@ -8,8 +8,8 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-// Use the basename from the base URL to ensure correct routing
-const baseUrl = import.meta.env.BASE_URL;
+// Ensure we get the base URL correctly - strip any trailing slashes for consistency
+const baseUrl = import.meta.env.BASE_URL.replace(/\/+$/, '');
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
