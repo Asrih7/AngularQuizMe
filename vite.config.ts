@@ -5,7 +5,7 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  base: "/AngularQuizMe/", // Changed from "/" to match your GitHub Pages URL path
+  base: "/AngularQuizMe/", // This ensures all assets are loaded from the correct GitHub Pages path
   server: {
     host: "::",
     port: 8080,

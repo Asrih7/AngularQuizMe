@@ -8,8 +8,8 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-// Get the base URL from the import.meta.env or default to '/AngularQuizMe/'
-const baseUrl = import.meta.env.BASE_URL || "/AngularQuizMe/";
+// Use the basename from the base URL to ensure correct routing
+const baseUrl = import.meta.env.BASE_URL;
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
