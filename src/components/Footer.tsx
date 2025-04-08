@@ -6,7 +6,7 @@ const Footer = () => {
     <footer className="py-6 border-t">
       <div className="container flex flex-col md:flex-row items-center justify-between">
         <div className="text-sm text-muted-foreground mb-4 md:mb-0 text-center md:text-left">
-          © 2025 CodeSavvy Quiz. All rights reserved.
+          © 2025 AngularQuizMe Quiz. All rights reserved.
         </div>
         <div className="flex items-center space-x-4">
           <a 
